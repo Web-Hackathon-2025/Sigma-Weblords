@@ -28,6 +28,8 @@ model User {
   reviewsReceived   Review[]          @relation("ReviewsReceived")
   providerProfile   ProviderProfile?
   notifications     Notification[]
+  reportsSubmitted  Report[]          @relation("ReportsSubmitted")
+  reportsReceived   Report[]          @relation("ReportsReceived")
 }
 
 model Service {
@@ -47,6 +49,7 @@ model Service {
   provider   User             @relation(fields: [providerId], references: [id])
   requests   ServiceRequest[]
   reviews    Review[]
+  reports    Report[]
 }
 
 model ServiceRequest {
@@ -67,6 +70,7 @@ model ServiceRequest {
   providerId String
   provider   User    @relation("ProviderBookings", fields: [providerId], references: [id])
   review     Review?
+  reports    Report[]
 }
 
 model Review {
@@ -84,6 +88,7 @@ model Review {
   customer   User           @relation("ReviewsGiven", fields: [customerId], references: [id])
   providerId String
   provider   User           @relation("ReviewsReceived", fields: [providerId], references: [id])
+  reports    Report[]
 }
 
 model ProviderProfile {
@@ -115,4 +120,28 @@ model Notification {
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  type        String   // USER, SERVICE, REVIEW, BOOKING
+  reason      String
+  description String?
+  status      String   @default("PENDING") // PENDING, INVESTIGATING, RESOLVED, DISMISSED
+  resolution  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reporterId  String
+  reporter    User     @relation("ReportsSubmitted", fields: [reporterId], references: [id])
+  
+  // Target can be a user, service, review, or booking
+  targetUserId    String?
+  targetUser      User?    @relation("ReportsReceived", fields: [targetUserId], references: [id])
+  targetServiceId String?
+  targetService   Service? @relation(fields: [targetServiceId], references: [id])
+  targetReviewId  String?
+  targetReview    Review?  @relation(fields: [targetReviewId], references: [id])
+  targetBookingId String?
+  targetBooking   ServiceRequest? @relation(fields: [targetBookingId], references: [id])
 }

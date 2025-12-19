@@ -18,9 +18,9 @@ export async function GET(
         image: true,
         phone: true,
         address: true,
-        city: true,
         bio: true,
         createdAt: true,
+        providerProfile: true,
         services: {
           where: { isActive: true },
           select: {
@@ -29,11 +29,11 @@ export async function GET(
             title: true,
             description: true,
             price: true,
-            priceUnit: true,
-            availability: true,
+            priceType: true,
+            location: true,
           },
         },
-        providerReviews: {
+        reviewsReceived: {
           include: {
             customer: {
               select: {
@@ -65,11 +65,11 @@ export async function GET(
     }
 
     // Calculate average rating
-    const reviews = provider.providerReviews;
+    const reviews = provider.reviewsReceived;
     const avgRating =
       reviews.length > 0
         ? reviews.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0) / reviews.length
-        : 0;
+        : provider.providerProfile?.averageRating || 0;
 
     // Get unique categories
     const categories = [...new Set(provider.services.map((s: { category: string }) => s.category))];
@@ -78,6 +78,9 @@ export async function GET(
       ...provider,
       avgRating: Math.round(avgRating * 10) / 10,
       reviewCount: reviews.length,
+      completedJobs: provider.providerProfile?.completedJobs || 0,
+      yearsExperience: provider.providerProfile?.yearsExperience || 0,
+      isVerified: provider.providerProfile?.isVerified || false,
       categories,
     });
   } catch (error) {

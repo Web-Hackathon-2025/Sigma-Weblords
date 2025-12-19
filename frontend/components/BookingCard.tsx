@@ -8,7 +8,8 @@ interface BookingCardProps {
   booking: {
     id: string;
     status: string;
-    scheduledAt: string;
+    scheduledDate: string;
+    scheduledTime: string;
     address: string;
     totalPrice?: number;
     createdAt: string;
@@ -17,7 +18,7 @@ interface BookingCardProps {
       title: string;
       category: string;
       price: number;
-      priceUnit: string;
+      priceType: string;
     };
     provider?: {
       id: string;
@@ -38,7 +39,7 @@ interface BookingCardProps {
 
 export default function BookingCard({ booking, viewAs }: BookingCardProps) {
   const statusColors: Record<string, string> = {
-    REQUESTED: "badge-warning",
+    PENDING: "badge-warning",
     CONFIRMED: "badge-primary",
     IN_PROGRESS: "badge-primary",
     COMPLETED: "badge-success",
@@ -46,11 +47,20 @@ export default function BookingCard({ booking, viewAs }: BookingCardProps) {
   };
 
   const statusLabels: Record<string, string> = {
-    REQUESTED: "Pending",
+    PENDING: "Pending",
     CONFIRMED: "Confirmed",
     IN_PROGRESS: "In Progress",
     COMPLETED: "Completed",
     CANCELLED: "Cancelled",
+  };
+
+  // Format time string like "08:00" to "8:00 AM"
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(":");
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
   };
 
   const person = viewAs === "customer" ? booking.provider : booking.customer;
@@ -93,12 +103,12 @@ export default function BookingCard({ booking, viewAs }: BookingCardProps) {
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Calendar className="w-4 h-4" />
-            <span>{format(new Date(booking.scheduledAt), "MMM d, yyyy")}</span>
+            <span>{format(new Date(booking.scheduledDate), "MMM d, yyyy")}</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Clock className="w-4 h-4" />
-            <span>{format(new Date(booking.scheduledAt), "h:mm a")}</span>
+            <span>{formatTime(booking.scheduledTime)}</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">

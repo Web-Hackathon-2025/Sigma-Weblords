@@ -23,7 +23,8 @@ import { StarRating, Modal, LoadingSpinner } from "@/components";
 interface Booking {
   id: string;
   status: string;
-  scheduledAt: string;
+  scheduledDate: string;
+  scheduledTime: string;
   address: string;
   notes?: string;
   totalPrice?: number;
@@ -41,7 +42,6 @@ interface Booking {
     email: string;
     image?: string;
     phone?: string;
-    city?: string;
   };
   service: {
     id: string;
@@ -49,7 +49,7 @@ interface Booking {
     category: string;
     description: string;
     price: number;
-    priceUnit: string;
+    priceType: string;
   };
   review?: {
     id: string;
@@ -183,7 +183,7 @@ export default function BookingDetailPage() {
   const isProvider = session?.user?.id === booking.provider.id;
 
   const statusColors: Record<string, string> = {
-    REQUESTED: "bg-amber-100 text-amber-700",
+    PENDING: "bg-amber-100 text-amber-700",
     CONFIRMED: "bg-blue-100 text-blue-700",
     IN_PROGRESS: "bg-purple-100 text-purple-700",
     COMPLETED: "bg-green-100 text-green-700",
@@ -191,11 +191,20 @@ export default function BookingDetailPage() {
   };
 
   const statusLabels: Record<string, string> = {
-    REQUESTED: "Pending Confirmation",
+    PENDING: "Pending Confirmation",
     CONFIRMED: "Confirmed",
     IN_PROGRESS: "In Progress",
     COMPLETED: "Completed",
     CANCELLED: "Cancelled",
+  };
+
+  // Format time string like "08:00" to "8:00 AM"
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(":");
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
   };
 
   return (
@@ -228,7 +237,9 @@ export default function BookingDetailPage() {
               <span className="text-3xl font-bold text-blue-600">
                 ${booking.totalPrice || booking.service.price}
               </span>
-              <p className="text-sm text-gray-500">{booking.service.priceUnit}</p>
+              <p className="text-sm text-gray-500">
+                / {booking.service.priceType === "HOURLY" ? "hour" : booking.service.priceType === "SQFT" ? "sq ft" : "fixed"}
+              </p>
             </div>
           </div>
         </div>
@@ -245,7 +256,7 @@ export default function BookingDetailPage() {
                 <div>
                   <p className="text-sm text-gray-500">Date</p>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {format(new Date(booking.scheduledAt), "EEEE, MMMM d, yyyy")}
+                    {format(new Date(booking.scheduledDate), "EEEE, MMMM d, yyyy")}
                   </p>
                 </div>
               </div>
@@ -254,7 +265,7 @@ export default function BookingDetailPage() {
                 <div>
                   <p className="text-sm text-gray-500">Time</p>
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {format(new Date(booking.scheduledAt), "h:mm a")}
+                    {formatTime(booking.scheduledTime)}
                   </p>
                 </div>
               </div>
@@ -297,9 +308,6 @@ export default function BookingDetailPage() {
                 <h3 className="font-semibold text-gray-900 dark:text-white">
                   {(isCustomer ? booking.provider : booking.customer).name}
                 </h3>
-                {isCustomer && booking.provider.city && (
-                  <p className="text-sm text-gray-500">{booking.provider.city}</p>
-                )}
               </div>
             </div>
             <div className="space-y-3">
@@ -336,7 +344,7 @@ export default function BookingDetailPage() {
           {/* Provider Actions */}
           {isProvider && (
             <div className="flex flex-wrap gap-3">
-              {booking.status === "REQUESTED" && (
+              {booking.status === "PENDING" && (
                 <>
                   <button
                     onClick={() => updateBookingStatus("CONFIRMED")}
@@ -391,7 +399,7 @@ export default function BookingDetailPage() {
           {/* Customer Actions */}
           {isCustomer && (
             <div className="flex flex-wrap gap-3">
-              {["REQUESTED", "CONFIRMED"].includes(booking.status) && (
+              {["PENDING", "CONFIRMED"].includes(booking.status) && (
                 <button
                   onClick={() => updateBookingStatus("CANCELLED")}
                   disabled={actionLoading}

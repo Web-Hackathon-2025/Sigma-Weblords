@@ -35,7 +35,7 @@ export async function GET(
             email: true,
             image: true,
             phone: true,
-            city: true,
+            address: true,
           },
         },
         service: true,
@@ -93,11 +93,11 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { status, scheduledAt, notes } = body;
+    const { status, scheduledDate, scheduledTime, notes } = body;
 
     // Validate status transitions
     const validTransitions: Record<string, string[]> = {
-      REQUESTED: ["CONFIRMED", "CANCELLED"],
+      PENDING: ["CONFIRMED", "CANCELLED"],
       CONFIRMED: ["IN_PROGRESS", "CANCELLED"],
       IN_PROGRESS: ["COMPLETED", "CANCELLED"],
       COMPLETED: [],
@@ -139,7 +139,8 @@ export async function PUT(
       where: { id },
       data: {
         ...(status && { status }),
-        ...(scheduledAt && { scheduledAt: new Date(scheduledAt) }),
+        ...(scheduledDate && { scheduledDate: new Date(scheduledDate) }),
+        ...(scheduledTime && { scheduledTime }),
         ...(notes !== undefined && { notes }),
       },
       include: {

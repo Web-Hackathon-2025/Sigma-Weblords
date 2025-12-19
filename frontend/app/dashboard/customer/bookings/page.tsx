@@ -8,7 +8,8 @@ import { BookingCard, LoadingSpinner } from "@/components";
 interface Booking {
   id: string;
   status: string;
-  scheduledAt: string;
+  scheduledDate: string;
+  scheduledTime: string;
   address: string;
   totalPrice?: number;
   createdAt: string;
@@ -17,7 +18,7 @@ interface Booking {
     title: string;
     category: string;
     price: number;
-    priceUnit: string;
+    priceType: string;
   };
   provider: {
     id: string;
@@ -82,7 +83,7 @@ export default function CustomerBookingsPage() {
 
   const statusFilters = [
     { value: "ALL", label: "All" },
-    { value: "REQUESTED", label: "Pending" },
+    { value: "PENDING", label: "Pending" },
     { value: "CONFIRMED", label: "Confirmed" },
     { value: "IN_PROGRESS", label: "In Progress" },
     { value: "COMPLETED", label: "Completed" },

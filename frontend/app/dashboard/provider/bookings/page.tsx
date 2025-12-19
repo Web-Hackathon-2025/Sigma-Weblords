@@ -39,7 +39,7 @@ interface Booking {
     id: string;
     title: string;
     price: number;
-    priceUnit: string;
+    priceType: string;
   };
 }
 
@@ -308,7 +308,7 @@ export default function ProviderBookingsPage() {
                         )}
 
                         <p className="mt-3 text-lg font-semibold text-blue-600">
-                          ${booking.service.price} {booking.service.priceUnit}
+                          ${booking.service.price} / {booking.service.priceType === "HOURLY" ? "hour" : booking.service.priceType === "SQFT" ? "sq ft" : "fixed"}
                         </p>
                       </div>
 

@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     };
 
     if (city) {
-      where.city = {
+      where.address = {
         contains: city,
         mode: "insensitive",
       };
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
           email: true,
           image: true,
           phone: true,
-          city: true,
+          address: true,
           bio: true,
           services: {
             where: { isActive: true },
@@ -48,14 +48,16 @@ export async function GET(request: NextRequest) {
               category: true,
               title: true,
               price: true,
-              priceUnit: true,
+              priceType: true,
+              location: true,
             },
           },
-          providerReviews: {
+          reviewsReceived: {
             select: {
               rating: true,
             },
           },
+          providerProfile: true,
         },
         orderBy: { createdAt: "desc" },
         skip,
@@ -65,17 +67,20 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Calculate average ratings
-    const providersWithRatings = providers.map((provider) => {
-      const reviews = provider.providerReviews;
+    const providersWithRatings = providers.map((provider: typeof providers[number]) => {
+      const reviews = provider.reviewsReceived;
       const avgRating =
         reviews.length > 0
           ? reviews.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0) / reviews.length
-          : 0;
+          : provider.providerProfile?.averageRating || 0;
       return {
         ...provider,
         avgRating: Math.round(avgRating * 10) / 10,
         reviewCount: reviews.length,
-        providerReviews: undefined,
+        completedJobs: provider.providerProfile?.completedJobs || 0,
+        isVerified: provider.providerProfile?.isVerified || false,
+        reviewsReceived: undefined,
+        providerProfile: undefined,
       };
     });
 

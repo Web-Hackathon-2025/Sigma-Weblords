@@ -22,7 +22,7 @@ interface Service {
   title: string;
   category: string;
   price: number;
-  priceUnit: string;
+  priceType: string;
   location: string;
   isActive: boolean;
   createdAt: string;
@@ -267,7 +267,7 @@ export default function AdminServicesPage() {
                   <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-4">
                     <span>{service.location}</span>
                     <span className="font-semibold text-blue-600">
-                      ${service.price} {service.priceUnit}
+                      ${service.price} {service.priceType}
                     </span>
                   </div>
 

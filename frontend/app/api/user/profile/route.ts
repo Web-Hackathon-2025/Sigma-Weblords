@@ -21,10 +21,10 @@ export async function GET() {
         image: true,
         phone: true,
         address: true,
-        city: true,
         role: true,
         bio: true,
         createdAt: true,
+        providerProfile: true,
       },
     });
 
@@ -52,14 +52,13 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, phone, address, city, bio, image, currentPassword, newPassword } = body;
+    const { name, phone, address, bio, image, currentPassword, newPassword } = body;
 
     const updateData: any = {};
 
     if (name) updateData.name = name;
     if (phone !== undefined) updateData.phone = phone;
     if (address !== undefined) updateData.address = address;
-    if (city !== undefined) updateData.city = city;
     if (bio !== undefined) updateData.bio = bio;
     if (image !== undefined) updateData.image = image;
 
@@ -111,9 +110,9 @@ export async function PUT(request: NextRequest) {
         image: true,
         phone: true,
         address: true,
-        city: true,
         role: true,
         bio: true,
+        providerProfile: true,
       },
     });
 

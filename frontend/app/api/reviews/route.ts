@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     // Check if booking exists and is completed
     const booking = await prisma.serviceRequest.findUnique({
       where: { id: requestId },
-      include: { review: true },
+      include: { review: true, service: true },
     });
 
     if (!booking) {
@@ -150,6 +150,7 @@ export async function POST(request: NextRequest) {
       data: {
         customerId: session.user.id,
         providerId: booking.providerId,
+        serviceId: booking.serviceId,
         requestId,
         rating,
         comment,

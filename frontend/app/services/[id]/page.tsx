@@ -18,35 +18,39 @@ import {
 } from "lucide-react";
 import { StarRating, Modal, LoadingSpinner } from "@/components";
 
+interface Review {
+  id: string;
+  rating: number;
+  comment?: string;
+  createdAt: string;
+  customer: {
+    name: string;
+    image?: string;
+  };
+}
+
 interface Service {
   id: string;
   title: string;
   description: string;
   category: string;
   price: number;
-  priceUnit: string;
-  availability?: string;
+  priceType: string;
+  location: string;
+  reviews: Review[];
   provider: {
     id: string;
     name: string;
     email: string;
     image?: string;
     phone?: string;
-    city?: string;
     address?: string;
     bio?: string;
     avgRating: number;
     reviewCount: number;
-    providerReviews: Array<{
-      id: string;
-      rating: number;
-      comment?: string;
-      createdAt: string;
-      customer: {
-        name: string;
-        image?: string;
-      };
-    }>;
+    completedJobs: number;
+    yearsExperience: number;
+    isVerified: boolean;
   };
 }
 
@@ -59,7 +63,8 @@ export default function ServiceDetailPage() {
   const [loading, setLoading] = useState(true);
   const [bookingModal, setBookingModal] = useState(false);
   const [bookingData, setBookingData] = useState({
-    scheduledAt: "",
+    scheduledDate: "",
+    scheduledTime: "",
     address: "",
     notes: "",
   });
@@ -107,7 +112,8 @@ export default function ServiceDetailPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           serviceId: service?.id,
-          scheduledAt: new Date(bookingData.scheduledAt).toISOString(),
+          scheduledDate: bookingData.scheduledDate,
+          scheduledTime: bookingData.scheduledTime,
           address: bookingData.address,
           notes: bookingData.notes,
         }),
@@ -169,9 +175,6 @@ export default function ServiceDetailPage() {
     OTHER: "bg-gray-100 text-gray-700",
   };
 
-  // Get minimum date/time (now + 1 hour)
-  const minDateTime = new Date(Date.now() + 60 * 60 * 1000).toISOString().slice(0, 16);
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -227,7 +230,7 @@ export default function ServiceDetailPage() {
                     ${service.price}
                   </span>
                   <span className="text-gray-500 dark:text-gray-400 ml-2">
-                    {service.priceUnit}
+                    / {service.priceType === "HOURLY" ? "hour" : service.priceType === "SQFT" ? "sq ft" : "fixed"}
                   </span>
                 </div>
               </div>
@@ -236,16 +239,16 @@ export default function ServiceDetailPage() {
             {/* Reviews */}
             <div className="card">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                Reviews ({service.provider.reviewCount})
+                Reviews ({service.reviews.length})
               </h3>
 
-              {service.provider.providerReviews.length === 0 ? (
+              {service.reviews.length === 0 ? (
                 <p className="text-gray-500 dark:text-gray-400 text-center py-8">
                   No reviews yet
                 </p>
               ) : (
                 <div className="space-y-6">
-                  {service.provider.providerReviews.map((review) => (
+                  {service.reviews.map((review) => (
                     <div
                       key={review.id}
                       className="border-b border-gray-200 dark:border-slate-700 pb-6 last:border-0 last:pb-0"
@@ -325,10 +328,10 @@ export default function ServiceDetailPage() {
               )}
 
               <div className="mt-6 space-y-3">
-                {service.provider.city && (
+                {service.location && (
                   <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
                     <MapPin className="w-5 h-5" />
-                    <span>{service.provider.city}</span>
+                    <span>{service.location}</span>
                   </div>
                 )}
                 {service.provider.phone && (
@@ -411,18 +414,46 @@ export default function ServiceDetailPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Date & Time
+                Preferred Date
+              </label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="date"
+                  value={bookingData.scheduledDate}
+                  onChange={(e) => setBookingData({ ...bookingData, scheduledDate: e.target.value })}
+                  min={new Date().toISOString().split('T')[0]}
+                  required
+                  className="pl-10 w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 py-2 px-3"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Preferred Time
               </label>
               <div className="relative">
                 <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="datetime-local"
-                  value={bookingData.scheduledAt}
-                  onChange={(e) => setBookingData({ ...bookingData, scheduledAt: e.target.value })}
-                  min={minDateTime}
+                <select
+                  value={bookingData.scheduledTime}
+                  onChange={(e) => setBookingData({ ...bookingData, scheduledTime: e.target.value })}
                   required
-                  className="pl-10"
-                />
+                  className="pl-10 w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 py-2 px-3"
+                >
+                  <option value="">Select a time</option>
+                  <option value="08:00">8:00 AM</option>
+                  <option value="09:00">9:00 AM</option>
+                  <option value="10:00">10:00 AM</option>
+                  <option value="11:00">11:00 AM</option>
+                  <option value="12:00">12:00 PM</option>
+                  <option value="13:00">1:00 PM</option>
+                  <option value="14:00">2:00 PM</option>
+                  <option value="15:00">3:00 PM</option>
+                  <option value="16:00">4:00 PM</option>
+                  <option value="17:00">5:00 PM</option>
+                  <option value="18:00">6:00 PM</option>
+                </select>
               </div>
             </div>
 
@@ -459,7 +490,7 @@ export default function ServiceDetailPage() {
               <div className="flex items-center justify-between mb-4">
                 <span className="text-gray-600 dark:text-gray-400">Service Price</span>
                 <span className="text-xl font-bold text-blue-600">
-                  ${service.price} {service.priceUnit}
+                  ${service.price} / {service.priceType === "HOURLY" ? "hour" : service.priceType === "SQFT" ? "sq ft" : "fixed"}
                 </span>
               </div>
 

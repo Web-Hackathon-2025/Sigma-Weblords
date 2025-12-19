@@ -64,15 +64,28 @@ body {
   background: var(--primary);
 }
 
-/* Form Styles */
+/* Form Styles - use individual padding properties so Tailwind can override padding-left */
 input, textarea, select {
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
+  padding-top: 0.75rem;
+  padding-right: 1rem;
+  padding-bottom: 0.75rem;
+  padding-left: 1rem;
   width: 100%;
   transition: all 0.2s ease;
 }
+
+/* 
+ * For inputs with icons, Tailwind's pl-10/pl-12 classes should override padding-left.
+ * However, since Tailwind classes and element selectors have similar specificity,
+ * we need to ensure the Tailwind classes win by avoiding the shorthand 'padding' property.
+ * 
+ * Icon positioning guide:
+ * - Icon at left-3 (0.75rem) with w-5 (1.25rem) → text starts at pl-10 (2.5rem)
+ * - Icon at left-4 (1rem) with w-5 (1.25rem) → text starts at pl-12 (3rem)
+ */
 
 input:focus, textarea:focus, select:focus {
   outline: none;

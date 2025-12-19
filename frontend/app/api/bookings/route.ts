@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
               email: true,
               image: true,
               phone: true,
-              city: true,
+              address: true,
             },
           },
           service: {
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
               title: true,
               category: true,
               price: true,
-              priceUnit: true,
+              priceType: true,
             },
           },
           review: true,
@@ -110,12 +110,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { serviceId, scheduledAt, notes, address } = body;
+    const { serviceId, scheduledDate, scheduledTime, notes, address } = body;
 
     // Validation
-    if (!serviceId || !scheduledAt || !address) {
+    if (!serviceId || !scheduledDate || !scheduledTime || !address) {
       return NextResponse.json(
-        { error: "Service, scheduled date, and address are required" },
+        { error: "Service, scheduled date, scheduled time, and address are required" },
         { status: 400 }
       );
     }
@@ -141,19 +141,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for scheduling conflicts
-    const scheduledDate = new Date(scheduledAt);
-    const twoHoursBefore = new Date(scheduledDate.getTime() - 2 * 60 * 60 * 1000);
-    const twoHoursAfter = new Date(scheduledDate.getTime() + 2 * 60 * 60 * 1000);
+    // Parse the scheduled date
+    const parsedDate = new Date(scheduledDate);
 
+    // Check for scheduling conflicts (same provider, same date, same time)
     const existingBooking = await prisma.serviceRequest.findFirst({
       where: {
         providerId: service.providerId,
-        status: { in: ["REQUESTED", "CONFIRMED", "IN_PROGRESS"] },
-        scheduledAt: {
-          gte: twoHoursBefore,
-          lte: twoHoursAfter,
-        },
+        status: { in: ["PENDING", "CONFIRMED", "IN_PROGRESS"] },
+        scheduledDate: parsedDate,
+        scheduledTime: scheduledTime,
       },
     });
 
@@ -170,7 +167,8 @@ export async function POST(request: NextRequest) {
         customerId: session.user.id,
         providerId: service.providerId,
         serviceId,
-        scheduledAt: scheduledDate,
+        scheduledDate: parsedDate,
+        scheduledTime,
         notes,
         address,
         totalPrice: service.price,
