@@ -4,7 +4,8 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogIn, Mail, Lock, Eye, EyeOff, Wrench } from "lucide-react";
+import { LogIn, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { LogoIcon } from "@/components";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -44,8 +45,8 @@ export default function SignInPage() {
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl mb-4">
-            <Wrench className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center mb-4">
+            <LogoIcon size="xl" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
           <p className="text-gray-600 mt-2">Sign in to your Karigar account</p>

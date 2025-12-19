@@ -8,6 +8,7 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import { Logo } from "./Logo";
 
 export default function Footer() {
   return (
@@ -16,12 +17,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-xl">K</span>
-              </div>
-              <span className="text-xl font-bold text-white">Karigar</span>
-            </Link>
+            <div className="mb-4">
+              <Logo size="md" variant="white" />
+            </div>
             <p className="text-sm text-gray-400 mb-4">
               Connecting you with trusted local service providers. Quality
               services at your doorstep.

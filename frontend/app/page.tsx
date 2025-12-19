@@ -50,7 +50,7 @@ export default function HomePage() {
     e.preventDefault();
     const params = new URLSearchParams();
     if (searchQuery) params.set("search", searchQuery);
-    if (location) params.set("city", location);
+    if (location) params.set("location", location);
     router.push(`/services?${params.toString()}`);
   };
 

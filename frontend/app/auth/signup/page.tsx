@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { UserPlus, Mail, Lock, Eye, EyeOff, User, Wrench } from "lucide-react";
+import { UserPlus, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { LogoIcon } from "@/components";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -60,8 +61,8 @@ export default function SignUpPage() {
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl mb-4">
-            <Wrench className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center mb-4">
+            <LogoIcon size="xl" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Create Account</h1>
           <p className="text-gray-600 mt-2">Join Karigar marketplace today</p>
@@ -166,14 +167,14 @@ export default function SignUpPage() {
                 onClick={() => setRole("CUSTOMER")}
                 className={`p-4 rounded-lg border-2 transition-all ${
                   role === "CUSTOMER"
-                    ? "border-orange-500 bg-orange-50 text-orange-700"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-orange-500 bg-orange-50"
+                    : "border-gray-200 hover:border-gray-300 bg-white"
                 }`}
               >
                 <div className="text-center">
                   <div className="text-2xl mb-1">🛒</div>
-                  <div className="font-medium">Hire Services</div>
-                  <div className="text-xs text-gray-500">Find local experts</div>
+                  <div className={`font-semibold ${role === "CUSTOMER" ? "text-orange-700" : "text-gray-800"}`}>Hire Services</div>
+                  <div className={`text-xs ${role === "CUSTOMER" ? "text-orange-600" : "text-gray-600"}`}>Find local experts</div>
                 </div>
               </button>
               <button
@@ -181,14 +182,14 @@ export default function SignUpPage() {
                 onClick={() => setRole("PROVIDER")}
                 className={`p-4 rounded-lg border-2 transition-all ${
                   role === "PROVIDER"
-                    ? "border-orange-500 bg-orange-50 text-orange-700"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-orange-500 bg-orange-50"
+                    : "border-gray-200 hover:border-gray-300 bg-white"
                 }`}
               >
                 <div className="text-center">
                   <div className="text-2xl mb-1">🔧</div>
-                  <div className="font-medium">Offer Services</div>
-                  <div className="text-xs text-gray-500">Become a provider</div>
+                  <div className={`font-semibold ${role === "PROVIDER" ? "text-orange-700" : "text-gray-800"}`}>Offer Services</div>
+                  <div className={`text-xs ${role === "PROVIDER" ? "text-orange-600" : "text-gray-600"}`}>Become a provider</div>
                 </div>
               </button>
             </div>

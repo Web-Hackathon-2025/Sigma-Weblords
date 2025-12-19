@@ -7,3 +7,4 @@ export { default as Modal } from "./Modal";
 export { default as LoadingSpinner } from "./LoadingSpinner";
 export { default as CategoryFilter, categories } from "./CategoryFilter";
 export { default as Providers } from "./Providers";
+export { Logo, LogoIcon } from "./Logo";

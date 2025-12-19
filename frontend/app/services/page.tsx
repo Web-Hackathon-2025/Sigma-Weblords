@@ -45,7 +45,7 @@ function ServicesContent() {
   const [filters, setFilters] = useState({
     search: searchParams.get("search") || "",
     category: searchParams.get("category") || "ALL",
-    location: searchParams.get("location") || "",
+    location: searchParams.get("location") || searchParams.get("city") || "",
   });
 
   const fetchServices = async () => {
