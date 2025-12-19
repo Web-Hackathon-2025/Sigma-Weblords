@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String?
+  image         String?
+  phone         String?
+  address       String?
+  bio           String?
+  role          String    @default("CUSTOMER")
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  services         Service[]
+  bookingsAsCustomer ServiceRequest[] @relation("CustomerBookings")
+  bookingsAsProvider ServiceRequest[] @relation("ProviderBookings")
+  reviewsGiven      Review[]          @relation("ReviewsGiven")
+  reviewsReceived   Review[]          @relation("ReviewsReceived")
+  providerProfile   ProviderProfile?
+  notifications     Notification[]
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  category    String
+  price       Float
+  priceType   String   @default("FIXED")
+  location    String
+  images      String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  providerId String
+  provider   User             @relation(fields: [providerId], references: [id])
+  requests   ServiceRequest[]
+  reviews    Review[]
+}
+
+model ServiceRequest {
+  id              String   @id @default(cuid())
+  status          String   @default("PENDING")
+  scheduledDate   DateTime
+  scheduledTime   String
+  notes           String?
+  address         String
+  totalPrice      Float?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  serviceId  String
+  service    Service @relation(fields: [serviceId], references: [id])
+  customerId String
+  customer   User    @relation("CustomerBookings", fields: [customerId], references: [id])
+  providerId String
+  provider   User    @relation("ProviderBookings", fields: [providerId], references: [id])
+  review     Review?
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  serviceId  String
+  service    Service        @relation(fields: [serviceId], references: [id])
+  requestId  String         @unique
+  request    ServiceRequest @relation(fields: [requestId], references: [id])
+  customerId String
+  customer   User           @relation("ReviewsGiven", fields: [customerId], references: [id])
+  providerId String
+  provider   User           @relation("ReviewsReceived", fields: [providerId], references: [id])
+}
+
+model ProviderProfile {
+  id                String   @id @default(cuid())
+  businessName      String?
+  yearsExperience   Int      @default(0)
+  serviceAreas      String?
+  certifications    String?
+  availability      String?
+  isVerified        Boolean  @default(false)
+  totalEarnings     Float    @default(0)
+  completedJobs     Int      @default(0)
+  averageRating     Float    @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
